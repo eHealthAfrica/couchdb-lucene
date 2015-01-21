@@ -38,10 +38,13 @@ public final class Database {
     private final HttpClient httpClient;
 
     private final String url;
+    private final String dbName;
 
-    public Database(final HttpClient httpClient, final String url) {
+    public Database(final HttpClient httpClient, final String aUrl, final String dbName) {
+        final String url = aUrl + dbName;
         this.httpClient = httpClient;
         this.url = url.endsWith("/") ? url : url + "/";
+        this.dbName = dbName;
     }
 
     public boolean create() throws IOException {
@@ -59,6 +62,16 @@ public final class Database {
                         .urlEncode("\"_design0\"")));
         final JSONObject json = new JSONObject(body);
         return toDesignDocuments(json);
+    }
+
+    public List<DesignDocument> getIndexableDesignDocuments(List blacklist) throws IOException, JSONException {
+        final List<DesignDocument> result = new ArrayList<DesignDocument>();
+        for (final DesignDocument ddoc: getAllDesignDocuments()) {
+            if (!blacklist.contains(dbName + "/" + ddoc.getId())) {
+                result.add(ddoc);
+            }
+        };
+        return result;
     }
 
     public CouchDocument getDocument(final String id) throws IOException, JSONException {
