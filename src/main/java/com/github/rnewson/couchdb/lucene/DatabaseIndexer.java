@@ -436,11 +436,18 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
 
         try {
             init();
+            if (states.isEmpty()) {
+                logger.warn("Nothing to index, all documents are blacklisted in configuration");
+                close();
+                return;
+            }
         } catch (final Exception e) {
             logger.warn("Exiting after init() raised exception.", e);
             close();
             return;
         }
+
+
 
         try {
             try {
@@ -731,6 +738,10 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
 
     private IndexState getState(final HttpServletRequest req,
                                 final HttpServletResponse resp) throws IOException, JSONException {
+        if ((blacklist()).contains(toDatabaseDocumentPath(req))) {
+            ServletUtils.sendJsonError(req, resp, 422, "document in blacklist");
+            return null;
+        }
         final View view = paths.get(toPath(req));
         if (view == null) {
             ServletUtils.sendJsonError(req, resp, 400, "no_such_view");
@@ -774,7 +785,8 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         this.ddoc_seq = database.getInfo().getUpdateSequence();
         this.since = null;
 
-        for (final DesignDocument ddoc : database.getAllDesignDocuments()) {
+        for (final DesignDocument ddoc : database.getIndexableDesignDocuments(blacklist())) {
+
             for (final Entry<String, View> entry : ddoc.getAllViews()
                     .entrySet()) {
                 final String name = entry.getKey();
@@ -847,6 +859,11 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         return SECONDS.toNanos(commitSeconds);
     }
 
+    private String toDatabaseDocumentPath(final HttpServletRequest req) {
+        final PathParts parts = new PathParts(req);
+        return parts.getDatabaseName() + "/" + parts.getDesignDocumentName();
+    }
+
     private String toPath(final HttpServletRequest req) {
         final PathParts parts = new PathParts(req);
         return toPath(parts.getDesignDocumentName(), parts.getViewName());
@@ -856,4 +873,13 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         return ddoc + "/" + view;
     }
 
+
+    private final List<String> blacklist() {
+        Integer size = ini.getList("couchdb.blacklist", new ArrayList<String>()).size();
+        List<String> blacklist = new ArrayList<String>(size);
+            for (Object o : ini.getList("couchdb.blacklist", new ArrayList<String>())) {
+                blacklist.add(String.valueOf(o));
+            }
+        return blacklist;
+    }
 }

@@ -26,6 +26,7 @@ import org.eclipse.jetty.servlets.GzipFilter;
 
 import javax.servlet.DispatcherType;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class Main {
@@ -45,6 +46,15 @@ public class Main {
         connector.setPort(config.getConfiguration().getInt("lucene.port", 5985));
 
         LOG.info("Accepting connections with " + connector);
+
+        final int blacklistSize = config.getConfiguration().getList(
+                "couchdb.blacklist", new ArrayList<String>()).size();
+        if (blacklistSize > 0) {
+            LOG.info("Blacklisted index documents are "  +
+            config.getConfiguration().getList("couchdb.blacklist", new ArrayList<String>())
+            );
+        }
+
 
         server.addConnector(connector);
         server.setStopAtShutdown(true);

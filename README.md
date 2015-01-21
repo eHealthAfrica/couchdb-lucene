@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/rnewson/couchdb-lucene.png)](http://travis-ci.org/rnewson/couchdb-lucene)
+[![Build Status](https://travis-ci.org/eHealthAfrica/couchdb-lucene.svg)](https://travis-ci.org/eHealthAfrica/couchdb-lucene)
 
 <h1>Version Compatibility</h1>
 
@@ -648,6 +648,15 @@ and couchdb-lucene will authenticate to couchdb.
 <h1>Other Tricks</h1>
 
 A couple of 'expert' options can be set in the couchdb-lucene.ini file;
+
+CouchDB indexing documents can be blacklisted. This is useful when using 2 C-L instances,
+one indexing a new version of an index, allowing the old one to get the latest updates while the new one.
+is being indexed.
+<pre>
+[couchdb]
+blacklist=gin_call_centre/_design/search-version:0.0.5
+blacklist=gin_call_centre/_design/search-version:0.0.6
+</pre>
 
 Leading wildcards are prohibited by default as they perform very poorly most of the time. You can enable them as follows;
 
