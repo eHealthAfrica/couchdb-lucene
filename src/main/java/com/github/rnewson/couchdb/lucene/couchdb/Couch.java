@@ -49,7 +49,7 @@ public class Couch {
     }
 
     public Database getDatabase(final String dbname) throws IOException {
-        return new Database(httpClient, url + dbname);
+        return new Database(httpClient, url, dbname);
     }
 
 }
