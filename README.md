@@ -678,3 +678,39 @@ CouchDB-Lucene will keep your indexes up to date automatically but this consumes
 [lucene]
 changes_timeout = 60000
 </pre>
+
+## Typical deployment with 2 C-L instances
+(for cases when the running production instance doesn't have the blacklist functionality)
+
+- stop monit watching . `monit unwatch couchdb-lucene`
+- stop current
+- mv current to .bk
+- deploy 2 C-L, one temporary and one intended to become the production instance.
+- stop both instances
+- rsync all indexes from previous running installation to new ones
+    `rsync -va old/indexes new/`
+- on the temporary instance:
+  - configure the blacklist to include the new index (with db)
+- start both instances
+- push the new index document to the couchdb
+- run from the machine a C-L query against both instances:
+    -  `curl  'http://localhost:5985/local/DB_NAME/_design/INDEX_NAME/index'` --> temporary instance
+    -  `curl  'http://localhost:5986/local/DB_NAME/_design/INDEX_NAME/index'` --> production instance
+- let the production instance finish indexing **for all db** (tmp and production instances should have indexes at the same
+update_sequence, and matching couchdb udpate_sequence)
+
+
+- deploy new version of the app with the correct index version.
+- configure CouchDB: in `http://host:port/_utils/config.html`, **external**, **fti**  set to use the production instance port:
+    `/usr/bin/python /usr/local/couchdb-lucene-{version}-update/tools/couchdb-external-hook.py --remote-port=5986`
+- start monit watching . `monit watch couchdb-lucene`
+
+- cleanup:
+    - remove or move way the temporary instance
+    - update the couchdb-lucene.ini configuration to use port 5985
+    - restart coucdb-lucene
+    - configure CouchDB: in `http://host:port/_utils/config.html`, **external**, **fti**  set to use the changed production instance port:
+    `/usr/bin/python /usr/local/couchdb-lucene-1.0.3-update/tools/couchdb-external-hook.py --remote-port=5985`
+
+- final state:
+    - a C-L instance, in folder `/usr/local/couchdb-lucene-{version}` , running the previous indexes + updated index, configured at port `5895`, with service name `couchdb-lucene`
