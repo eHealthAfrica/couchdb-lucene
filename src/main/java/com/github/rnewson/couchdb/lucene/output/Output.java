@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public interface OutputFactory {
+public interface Output {
 
     /**
      * Transform the searched documents into response body

@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Default response
  */
-public class DefaultOutputImpl implements OutputFactory {
+public class DefaultOutputImpl implements Output {
 
     @Override
     public String getBody(HttpServletRequest req,
