@@ -25,8 +25,10 @@ public class OutputDispatcher {
                 if (output.equals(format.toString())) {
                     // keys
                     String keysParam = req.getParameter(KEYS_PARAM);
-                    if (keysParam == null) keysParam = "";
-                    String[] keys = keysParam.split(",");
+                    String[] keys = null;
+                    if (keysParam != null && !keysParam.trim().equals("")) {
+                        keys = keysParam.split(",");
+                    }
 
                     // returns Formatted Documents Output
                     return new DocumentsOutputImpl(callback, debug, format, keys);
