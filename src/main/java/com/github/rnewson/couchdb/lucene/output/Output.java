@@ -16,17 +16,13 @@ public interface Output {
      * @param req,   request
      * @param resp,  response
      * @param docs,  searched JSON documents
-     * @param eTag,  entity tag
-     * @param debug, debug mode?
      * @return the body response
      * @throws IOException
      * @throws JSONException
      */
     public String getBody(final HttpServletRequest req,
                           final HttpServletResponse resp,
-                          final JSONArray docs,
-                          final String eTag,
-                          final boolean debug)
+                          final JSONArray docs)
             throws IOException, JSONException;
 
 }

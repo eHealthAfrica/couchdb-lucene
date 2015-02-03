@@ -17,6 +17,8 @@
 package com.github.rnewson.couchdb.lucene;
 
 import com.github.rnewson.couchdb.lucene.couchdb.*;
+import com.github.rnewson.couchdb.lucene.output.Output;
+import com.github.rnewson.couchdb.lucene.output.OutputDispatcher;
 import com.github.rnewson.couchdb.lucene.util.*;
 import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.apache.http.HttpEntity;
@@ -654,26 +656,14 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
             state.returnSearcher(searcher);
         }
 
+
         resp.setHeader("ETag", etag);
         resp.setHeader("Cache-Control", "must-revalidate");
         ServletUtils.setResponseContentTypeAndEncoding(req, resp);
 
-        final Object json = result.length() > 1 ? result : result.getJSONObject(0);
-        final String callback = req.getParameter("callback");
-        final String body;
-        if (callback != null) {
-            body = String.format("%s(%s)", callback, json);
-        } else {
-            if (json instanceof JSONObject) {
-                final JSONObject obj = (JSONObject) json;
-                body = getBooleanParameter(req, "debug") ?
-                        obj.toString(2) : obj.toString();
-            } else {
-                final JSONArray arr = (JSONArray) json;
-                body = getBooleanParameter(req, "debug") ?
-                        arr.toString(2) : arr.toString();
-            }
-        }
+        // writes the output based on parameters
+        Output output = OutputDispatcher.getOutput(req);
+        String body = output.getBody(req, resp, result);
 
         final Writer writer = resp.getWriter();
         try {
