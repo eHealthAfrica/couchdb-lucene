@@ -45,7 +45,7 @@ public enum OutputFormats {
 
         switch (this) {
             case XML:
-                return org.json.XML.toString(docs, "doc");
+                return "<docs>" + org.json.XML.toString(docs, "doc") + "</docs>";
             case CSV:
                 return CDL.toString(JSONUtils.flat(docs, keys));
             case JSON:
