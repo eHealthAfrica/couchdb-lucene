@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class OutputDispatcher {
 
-    private static final String OUTPUT_PARAM = "o";
-    private static final String KEYS_PARAM = "k";
+    private static final String OUTPUT_PARAM = "output_format";
+    private static final String KEYS_PARAM = "export_keys";
 
     public static Output getOutput(final HttpServletRequest req) {
 
@@ -19,15 +19,15 @@ public class OutputDispatcher {
         final String callback = req.getParameter("callback");
         final boolean debug = Boolean.parseBoolean(req.getParameter("debug"));
 
-        // keys
-        String keysParam = req.getParameter(KEYS_PARAM);
-        if (keysParam == null) keysParam = "";
-        String[] keys = keysParam.split(",");
-
         if (includeDocs && output != null) {
             // returns only formatted documents
             for (OutputFormats format : OutputFormats.values()) {
                 if (output.equals(format.toString())) {
+                    // keys
+                    String keysParam = req.getParameter(KEYS_PARAM);
+                    if (keysParam == null) keysParam = "";
+                    String[] keys = keysParam.split(",");
+
                     // returns Formatted Documents Output
                     return new DocumentsOutputImpl(callback, debug, format, keys);
                 }
