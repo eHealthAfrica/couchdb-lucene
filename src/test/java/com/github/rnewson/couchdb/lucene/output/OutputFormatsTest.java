@@ -39,10 +39,12 @@ public class OutputFormatsTest {
         OutputFormats format = OutputFormats.XML;
         String result = format.transformDocs(docs, null);
 
-        String expected = "<doc><baz>1</baz><bar><foo>1</foo></bar></doc>" +
+        String expected = "<docs>" +
+                "<doc><baz>1</baz><bar><foo>1</foo></bar></doc>" +
                 "<doc><baz>2</baz><bar><foo>2</foo></bar></doc>" +
                 "<doc><baz>3</baz><bar><foo>3</foo></bar></doc>" +
-                "<doc><baz>4</baz><bar><foo>4</foo></bar></doc>";
+                "<doc><baz>4</baz><bar><foo>4</foo></bar></doc>" +
+                "</docs>";
 
         // nothing change
         assertThat(result, is(expected));
