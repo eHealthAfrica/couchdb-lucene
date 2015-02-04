@@ -17,7 +17,6 @@
 package com.github.rnewson.couchdb.lucene;
 
 import com.github.rnewson.couchdb.lucene.couchdb.*;
-import com.github.rnewson.couchdb.lucene.output.Output;
 import com.github.rnewson.couchdb.lucene.output.OutputDispatcher;
 import com.github.rnewson.couchdb.lucene.util.*;
 import org.apache.commons.configuration.HierarchicalINIConfiguration;
@@ -450,7 +449,6 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         }
 
 
-
         try {
             try {
                 final long changes_timeout = ini.getLong("lucene.changes_timeout", -1);
@@ -662,8 +660,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         ServletUtils.setResponseContentTypeAndEncoding(req, resp);
 
         // writes the output based on parameters
-        Output output = OutputDispatcher.getOutput(req);
-        String body = output.getBody(req, resp, result);
+        String body = OutputDispatcher.getOutput(req).getBody(req, resp, result);
 
         final Writer writer = resp.getWriter();
         try {
@@ -867,9 +864,9 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
     private final List<String> blacklist() {
         Integer size = ini.getList("couchdb.blacklist", new ArrayList<String>()).size();
         List<String> blacklist = new ArrayList<String>(size);
-            for (Object o : ini.getList("couchdb.blacklist", new ArrayList<String>())) {
-                blacklist.add(String.valueOf(o));
-            }
+        for (Object o : ini.getList("couchdb.blacklist", new ArrayList<String>())) {
+            blacklist.add(String.valueOf(o));
+        }
         return blacklist;
     }
 }
