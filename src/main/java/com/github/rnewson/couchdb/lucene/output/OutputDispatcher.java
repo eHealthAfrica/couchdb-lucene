@@ -9,6 +9,7 @@ public class OutputDispatcher {
 
     private static final String OUTPUT_PARAM = "output_format";
     private static final String KEYS_PARAM = "export_keys";
+    private static final String CSV_PARAM = "csv_labels";
 
     public static Output getOutput(final HttpServletRequest req) {
 
@@ -26,12 +27,14 @@ public class OutputDispatcher {
                     // keys
                     String keysParam = req.getParameter(KEYS_PARAM);
                     String[] keys = null;
-                    if (keysParam != null && !keysParam.trim().equals("")) {
+                    if (keysParam != null && keysParam.trim().length() > 0) {
                         keys = keysParam.split(",");
                     }
+                    String labels = req.getParameter(CSV_PARAM);
 
                     // returns Formatted Documents Output
-                    return new DocumentsOutputImpl(callback, debug, format, keys);
+                    return new DocumentsOutputImpl(callback, debug,
+                            format, keys, labels);
                 }
             }
         }
