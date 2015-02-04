@@ -439,6 +439,16 @@ The following parameters can be passed for more sophisticated searches;
 <dt>skip</dt><dd>the number of results to skip</dd>
 <dt>sort</dt><dd>the comma-separated fields to sort on. Prefix with / for ascending order and \ for descending order (ascending is the default if not specified). Type-specific sorting is also available by appending the type between angle brackets (e.g, sort=amount&lt;float&gt;). Supported types are 'float', 'double', 'int', 'long' and 'date'.</dd>
 <dt>stale=ok</dt><dd>If you set the <i>stale</i> option to <i>ok</i>, couchdb-lucene will not block if the index is not up to date and it will immediately return results. Therefore searches may be faster as Lucene caches important data (especially for sorting). A query without stale=ok will block and use the latest data committed to the index. Unlike CouchDBs stale=ok option for views, couchdb-lucene will trigger an index update unless one is already running.</dd>
+<dt>output_format</dt><dd>the expected output format for the documents export.
+Allowed values: <i>json</i>, <i>xml</i>, <i>csv</i>.
+It's used to export only the documents; 'include_docs' is needed; if it's false
+this parameter has no effect.</dd>
+<dt>export_keys</dt><dd>if 'output_format' is present this parameter will
+indicate the document properties that will be exported.</dd>
+<dt>csv_labels</dt><dd>if 'output_format=csv' this parameter indicates the
+first row with the column headers. Otherwise will be ignored.</dd>
+<dt>csv_delimiter</dt><dd>if 'output_format=csv' this parameter indicates the
+character used to separate the values.</dd>
 </dl>
 
 <i>All parameters except 'q' are optional.</i>
@@ -502,6 +512,9 @@ The search result contains a number of fields at the top level, in addition to y
 <dt>skip</dt><dd>The number of initial matches that was skipped.</dd>
 <dt>total_rows</dt><dd>The total number of matches for this query.</dd>
 </dl>
+
+If the parameter 'output_format' is present; the results format will only
+contain the formatted and mapped <i>search results array</i>.
 
 <h2>The search results array</h2>
 
