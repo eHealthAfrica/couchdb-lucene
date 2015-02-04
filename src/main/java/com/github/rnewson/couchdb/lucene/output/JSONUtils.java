@@ -5,7 +5,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -123,14 +122,7 @@ public class JSONUtils {
     public static JSONObject flat(JSONObject doc, String[] keys)
             throws JSONException {
         JSONObject target = new JSONObject();
-        String[] allowedKeys;
-        if (keys == null) {
-            allowedKeys = new String[0];
-        } else {
-            allowedKeys = Arrays.copyOf(keys, keys.length);
-            Arrays.sort(allowedKeys);
-        }
-        flatting(target, doc, null, allowedKeys);
+        flatting(target, doc, null, keys);
         return target;
     }
 
@@ -228,6 +220,8 @@ public class JSONUtils {
                                  String[] allowedKeys)
             throws JSONException {
 
+        if (obj == null) return; // nothing to do
+
         if (obj instanceof JSONObject) {
             JSONObject doc = (JSONObject) obj;
 
@@ -252,9 +246,18 @@ public class JSONUtils {
 
         } else {
             // already flat
-            if (allowedKeys == null || allowedKeys.length == 0
-                    || Arrays.binarySearch(allowedKeys, prefix) != -1) {
+            // check allowed keys
+            if (allowedKeys == null || allowedKeys.length == 0) {
                 target.putOpt(prefix, obj);
+            } else {
+                // check if the prefix is in the allowed keys
+                for (String allowedKey : allowedKeys) {
+                    if (allowedKey.startsWith(prefix)) {
+                        // it's in the list
+                        target.putOpt(prefix, obj);
+                        break;
+                    }
+                }
             }
         }
     }
