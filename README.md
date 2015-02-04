@@ -445,6 +445,8 @@ It's used to export only the documents; 'include_docs' is needed; if it's false
 this parameter has no effect.</dd>
 <dt>export_keys</dt><dd>if 'output_format' is present this parameter will
 indicate the document properties that will be exported.</dd>
+<dt>csv_labels</dt><dd>if 'output_format=csv' this parameter indicates the
+first row with the column headers. Otherwise will be ignored.</dd>
 </dl>
 
 <i>All parameters except 'q' are optional.</i>
