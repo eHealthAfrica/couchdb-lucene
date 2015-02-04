@@ -10,6 +10,7 @@ public class OutputDispatcher {
     private static final String OUTPUT_PARAM = "output_format";
     private static final String KEYS_PARAM = "export_keys";
     private static final String CSV_PARAM = "csv_labels";
+    private static final String DELIMITER_PARAM = "csv_delimiter";
 
     public static Output getOutput(final HttpServletRequest req) {
 
@@ -31,10 +32,11 @@ public class OutputDispatcher {
                         keys = keysParam.split(",");
                     }
                     String labels = req.getParameter(CSV_PARAM);
+                    String delimiter = req.getParameter(DELIMITER_PARAM);
 
                     // returns Formatted Documents Output
                     return new DocumentsOutputImpl(callback, debug,
-                            format, keys, labels);
+                            format, keys, labels, delimiter);
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.github.rnewson.couchdb.lucene.output;
 
-import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -39,22 +38,24 @@ public enum OutputFormats {
      */
     public String transformDocs(final JSONArray docs)
             throws JSONException {
-        return transformDocs(docs, null, null);
+        return transformDocs(docs, null, null, null);
     }
 
     /**
      * Transforms the given array of documents in the corresponding format
      * mapped by the list of keys
      *
-     * @param docs   the array of documents
-     * @param keys   the list of properties to be mapped
-     * @param labels the list of columns for the CSV format
+     * @param docs      the array of documents
+     * @param keys      the list of properties to be mapped
+     * @param labels    the list of columns for the CSV format
+     * @param delimiter the delimiter char for the CSV format
      * @return the string expression of the formatted documents
      * @throws JSONException
      */
     public String transformDocs(final JSONArray docs,
                                 final String[] keys,
-                                final String labels)
+                                final String labels,
+                                final String delimiter)
             throws JSONException {
 
         if (docs == null || docs.length() == 0) {
@@ -63,6 +64,14 @@ public enum OutputFormats {
 
         switch (this) {
             case CSV:
+                StringBuilder csv = new StringBuilder();
+                String join = ",";
+                if (delimiter != null && delimiter.length() == 1) {
+                    join = delimiter;
+                } else if (delimiter != null && delimiter.equals("tab")) {
+                    join = "\t";
+                }
+
                 // flatten documents
                 JSONArray flattenDocs = JSONUtils.flat(docs, keys);
                 // properties names
@@ -76,18 +85,24 @@ public enum OutputFormats {
                 }
 
                 // decide first row
-                String firstRow;
                 if (labels != null && labels.trim().length() > 0) {
                     // use labels as first row
-                    firstRow = labels;
+                    csv.append(labels);
                 } else {
                     // use properties names as first row
-                    firstRow = names.join(",");
+                    csv.append(names.join(join));
+                }
+                csv.append("\n");
+
+                for (int i = 0; i < flattenDocs.length(); i++) {
+                    csv.append(flattenDocs
+                            .getJSONObject(i)
+                            .toJSONArray(names)
+                            .join(join));
+                    csv.append("\n");
                 }
 
-                // create csv with documents and concatenate first row
-                return firstRow + "\n" + CDL.toString(names, flattenDocs);
-
+                return csv.toString();
             case XML:
                 return "<docs>" + org.json.XML.toString(docs, "doc") + "</docs>";
 

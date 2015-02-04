@@ -19,17 +19,20 @@ public class DocumentsOutputImpl implements Output {
     private boolean debug;
     private String[] keys;
     private String labels;
+    private String delimiter;
 
     public DocumentsOutputImpl(String callback,
                                boolean debug,
                                OutputFormats format,
                                String[] keys,
-                               String labels) {
+                               String labels,
+                               String delimiter) {
         this.callback = callback;
         this.debug = debug;
         this.format = format;
         this.keys = keys;
         this.labels = labels;
+        this.delimiter = delimiter;
     }
 
     @Override
@@ -46,7 +49,8 @@ public class DocumentsOutputImpl implements Output {
             resp.setContentType(this.format.getContentType());
             return this.debug ?
                     json.toString(2) :
-                    this.format.transformDocs(json, this.keys, this.labels);
+                    this.format.transformDocs(json, this.keys,
+                            this.labels, this.delimiter);
         }
     }
 }

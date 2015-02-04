@@ -447,6 +447,8 @@ this parameter has no effect.</dd>
 indicate the document properties that will be exported.</dd>
 <dt>csv_labels</dt><dd>if 'output_format=csv' this parameter indicates the
 first row with the column headers. Otherwise will be ignored.</dd>
+<dt>csv_delimiter</dt><dd>if 'output_format=csv' this parameter indicates the
+character used to separate the values.</dd>
 </dl>
 
 <i>All parameters except 'q' are optional.</i>
