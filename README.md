@@ -449,6 +449,10 @@ indicate the document properties that will be exported.</dd>
 first row with the column headers. Otherwise will be ignored.</dd>
 <dt>csv_delimiter</dt><dd>if 'output_format=csv' this parameter indicates the
 character used to separate the values.</dd>
+<dt>output_parser</dt><dd>if 'output_format' is present this parameter indicates
+the parser class name used to transform the searched documents before export.
+This class should be a subclass of
+<i>com.github.rnewson.couchdb.lucene.output.JSONParser</i></dd>
 </dl>
 
 <i>All parameters except 'q' are optional.</i>

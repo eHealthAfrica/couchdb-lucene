@@ -11,6 +11,7 @@ public class OutputDispatcher {
     private static final String KEYS_PARAM = "export_keys";
     private static final String CSV_PARAM = "csv_labels";
     private static final String DELIMITER_PARAM = "csv_delimiter";
+    private static final String PARSER_PARAM = "output_parser";
 
     public static Output getOutput(final HttpServletRequest req) {
 
@@ -33,10 +34,11 @@ public class OutputDispatcher {
                     }
                     String labels = req.getParameter(CSV_PARAM);
                     String delimiter = req.getParameter(DELIMITER_PARAM);
+                    String parser = req.getParameter(PARSER_PARAM);
 
                     // returns Formatted Documents Output
                     return new DocumentsOutputImpl(callback, debug,
-                            format, keys, labels, delimiter);
+                            format, keys, labels, delimiter, parser);
                 }
             }
         }
