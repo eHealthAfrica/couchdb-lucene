@@ -32,7 +32,7 @@ public class JSONUtilsTest {
         JSONArray docs = new JSONArray(input);
         String expected = new JSONArray(output).toString();
 
-        String result = JSONUtils.getDocs(docs, keys).toString();
+        String result = JSONUtils.getDocs(docs, keys, new JSONParser()).toString();
 
         assertThat(result, is(expected));
     }
@@ -102,7 +102,7 @@ public class JSONUtilsTest {
 
         JSONObject doc = new JSONObject(input);
         String expected = new JSONObject(output).toString();
-        String result = JSONUtils.map(doc, names).toString();
+        String result = JSONUtils.map(doc, names, new JSONParser()).toString();
 
         assertThat(result, is(expected));
     }
