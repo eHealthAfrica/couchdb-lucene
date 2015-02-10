@@ -26,11 +26,14 @@ public class JSONUtils {
      * Returns:
      * [ { "a" : 1 }, { "a" : 2 } ]
      *
-     * @param docs, the searched documents
-     * @param keys, the properties to use, if empty all
+     * @param docs   the searched documents
+     * @param keys   the properties to use, if empty all
+     * @param parser document parser, used to transform documents
      * @return the array of `doc` property included in the rows array
      */
-    public static JSONArray getDocs(JSONArray docs, String[] keys)
+    public static JSONArray getDocs(JSONArray docs,
+                                    String[] keys,
+                                    JSONParser parser)
             throws JSONException {
 
         JSONArray result = new JSONArray();
@@ -41,7 +44,7 @@ public class JSONUtils {
                 for (int j = 0; j < rows.length(); j++) {
                     JSONObject doc = rows.getJSONObject(j).getJSONObject("doc");
                     if (doc != null) {
-                        result.put(map(doc, keys));
+                        result.put(map(doc, keys, parser));
                     }
                 }
             }
@@ -61,12 +64,15 @@ public class JSONUtils {
      * Returns:
      * { "a" { "b" : 1 }, "d" : 4 }
      *
-     * @param doc  the document to be mapped
-     * @param keys the list of names for the new document
+     * @param doc    the document to be mapped
+     * @param keys   the list of names for the new document
+     * @param parser document parser
      * @return the mapped document or the original document if names is empty
      * @throws JSONException
      */
-    public static JSONObject map(JSONObject doc, String[] keys)
+    public static JSONObject map(JSONObject doc,
+                                 String[] keys,
+                                 JSONParser parser)
             throws JSONException {
         if (keys == null || keys.length == 0) {
             // nothing to map
@@ -74,19 +80,23 @@ public class JSONUtils {
         }
 
         JSONObject target = new JSONObject();
-        mapping(target, doc, keys);
+        mapping(target, doc, keys, parser);
         return target;
     }
 
     /**
      * Maps documents with the given list of properties
      *
-     * @param docs the array of documents
-     * @param keys the list of names for the new documents
+     * @param docs   the array of documents
+     * @param keys   the list of names for the new documents
+     * @param parser document parser
      * @return the array with mapped documents
      * @throws JSONException
      */
-    public static JSONArray map(JSONArray docs, String[] keys)
+    @SuppressWarnings("unused")
+    public static JSONArray map(JSONArray docs,
+                                String[] keys,
+                                JSONParser parser)
             throws JSONException {
 
         if (keys == null || keys.length == 0) {
@@ -97,7 +107,7 @@ public class JSONUtils {
         // create new array with mapped documents
         JSONArray array = new JSONArray();
         for (int i = 0; i < docs.length(); i++) {
-            array.put(map(docs.getJSONObject(i), keys));
+            array.put(map(docs.getJSONObject(i), keys, parser));
         }
 
         return array;
@@ -114,8 +124,8 @@ public class JSONUtils {
      * Returns:
      * { "a.b" : 1, "c.0" : 1, "c.1" : 2, "c.2" : 3, "d" : 4 }
      *
-     * @param doc   the document to be flattened
-     * @param keys, the properties to use, if empty all
+     * @param doc  the document to be flattened
+     * @param keys the properties to use, if empty all
      * @return the flattened document
      * @throws JSONException
      */
@@ -207,8 +217,12 @@ public class JSONUtils {
 
     private static void mapping(JSONObject target,
                                 JSONObject doc,
-                                String[] keys)
+                                String[] keys,
+                                JSONParser parser)
             throws JSONException {
+        if (parser != null) {
+            parser.parse(doc);
+        }
         for (String key : keys) {
             setNested(target, key, getNested(doc, key));
         }

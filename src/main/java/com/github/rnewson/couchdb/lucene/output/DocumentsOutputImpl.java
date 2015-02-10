@@ -20,19 +20,32 @@ public class DocumentsOutputImpl implements Output {
     private String[] keys;
     private String labels;
     private String delimiter;
+    private JSONParser parser;
 
     public DocumentsOutputImpl(String callback,
                                boolean debug,
                                OutputFormats format,
                                String[] keys,
                                String labels,
-                               String delimiter) {
+                               String delimiter,
+                               String parserClass) {
         this.callback = callback;
         this.debug = debug;
         this.format = format;
         this.keys = keys;
         this.labels = labels;
         this.delimiter = delimiter;
+        this.parser = new JSONParser();
+
+        if (parserClass != null && parserClass.length() > 0) {
+            // load parser class
+            try {
+                Class clazz = Class.forName(parserClass);
+                this.parser = (JSONParser) clazz.newInstance();
+            } catch (Exception e) {
+                // something went wrong, ignore parser
+            }
+        }
     }
 
     @Override
@@ -41,7 +54,7 @@ public class DocumentsOutputImpl implements Output {
                           JSONArray docs)
             throws IOException, JSONException {
 
-        final JSONArray json = JSONUtils.getDocs(docs, this.keys);
+        JSONArray json = JSONUtils.getDocs(docs, this.keys, this.parser);
 
         if (this.callback != null) {
             return String.format("%s(%s)", this.callback, json);
