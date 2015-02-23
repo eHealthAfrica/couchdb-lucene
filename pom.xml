@@ -18,12 +18,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.github.rnewson.couchdb.lucene</groupId>
     <artifactId>couchdb-lucene</artifactId>
     <name>CouchDB Lucene</name>
     <description>Full-text indexing for CouchDB</description>
     <url>http://github.com/eHealthAfrica/couchdb-lucene/</url>
     <version>1.0.5</version>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -148,6 +150,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <properties>
         <lucene-version>4.10.2</lucene-version>
         <tika-version>1.6</tika-version>
@@ -156,16 +159,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8
         </project.reporting.outputEncoding>
+        <external.dir>${basedir}</external.dir>
+        <external.src>${external.dir}/src/main</external.src>
+        <external.tests>${external.dir}/src/test</external.tests>
     </properties>
+
     <issueManagement>
         <system>github</system>
         <url>http://github.com/rnewson/couchdb-lucene/issues</url>
     </issueManagement>
+
     <scm>
         <connection>scm:git:git://github.com/rnewson/couchdb-lucene.git
         </connection>
         <url>http://github.com/rnewson/couchdb-lucene/</url>
     </scm>
+
     <licenses>
         <license>
             <name>Apache 2</name>
@@ -173,6 +182,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <id>rnewson</id>
@@ -184,6 +194,7 @@
             <timezone>0</timezone>
         </developer>
     </developers>
+
     <build>
         <defaultGoal>assembly:assembly</defaultGoal>
         <plugins>
@@ -192,7 +203,6 @@
                 <version>2.5</version>
                 <configuration>
                     <source>1.7</source>
-                    <showPackage>false</showPackage>
                     <links>
                         <link>http://java.sun.com/javase/6/docs/api/</link>
                         <link>http://lucene.apache.org/java/3_0_0/api/core/
@@ -242,6 +252,67 @@
                     <downloadSources>true</downloadSources>
                     <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${external.src}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-resource</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${external.src}/resources
+                                    </directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${external.tests}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-resource</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${external.tests}/resources
+                                    </directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
