@@ -34,6 +34,9 @@ public class OutputDispatcher {
                     }
                     String labels = req.getParameter(CSV_PARAM);
                     String delimiter = req.getParameter(DELIMITER_PARAM);
+                    if (delimiter == null || delimiter.isEmpty()) {
+                        delimiter = ","; // default value
+                    }
                     String parser = req.getParameter(PARSER_PARAM);
 
                     // returns Formatted Documents Output
