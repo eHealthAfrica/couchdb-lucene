@@ -1,5 +1,14 @@
+; deploy folders
 target
+indexes
+logs
+
+; ECLIPSE settings
 .classpath
 .project
 .settings
 *~
+
+; IDEA settings
+*.iml
+.idea
