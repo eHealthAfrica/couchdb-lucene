@@ -1,6 +1,7 @@
 package com.github.rnewson.couchdb.lucene.output;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +12,9 @@ import java.util.Iterator;
  * Common methods
  */
 public class JSONUtils {
+
+    private static Logger logger =
+            Logger.getLogger(JSONUtils.class.getName());
 
     /**
      * Extracts from the `rows` property in the array the property `doc`
@@ -149,7 +153,8 @@ public class JSONUtils {
         JSONArray target = new JSONArray();
         for (int i = 0; i < array.length(); i++) {
             if (!(array.get(i) instanceof JSONObject)) {
-                throw new JSONException("Error flattening JSONArray.");
+                logger.debug("Error flattening JSONArray.");
+                continue;
             }
             target.put(flat(array.getJSONObject(i), keys));
         }
@@ -295,7 +300,8 @@ public class JSONUtils {
 
             if (StringUtils.isNumeric(parts[0])) {
                 // this is not an array, something is wrong
-                throw new JSONException("getNested: Unexpected int key");
+                logger.debug("getNested: Unexpected int key");
+                return null;
             }
 
             if (parts[1].equals("")) {
@@ -315,7 +321,8 @@ public class JSONUtils {
 
             if (!StringUtils.isNumeric(parts[0])) {
                 // this is not an integer, something is wrong
-                throw new JSONException("getNested: Unexpected non-int key");
+                logger.debug("getNested: Unexpected non-int key");
+                return null;
             }
 
             int index = Integer.parseInt(parts[0]);
@@ -330,7 +337,8 @@ public class JSONUtils {
             }
 
         } else {
-            throw new JSONException("getNested: Unexpected object");
+            logger.debug("getNested: Unexpected object");
+            return null;
         }
     }
 
@@ -347,7 +355,8 @@ public class JSONUtils {
 
             if (StringUtils.isNumeric(parts[0])) {
                 // this is a number, something is wrong
-                throw new JSONException("setNested: Unexpected numeric key");
+                logger.debug("setNested: Unexpected numeric key");
+                return;
             }
 
             if (parts[1].equals("")) {
@@ -373,7 +382,8 @@ public class JSONUtils {
 
             if (!StringUtils.isNumeric(parts[0])) {
                 // this is not a number, something is wrong
-                throw new JSONException("setNested: Unexpected NaN key");
+                logger.debug("setNested: Unexpected NaN key");
+                return;
             }
 
             int index = Integer.parseInt(parts[0]);
@@ -389,7 +399,7 @@ public class JSONUtils {
             }
 
         } else {
-            throw new JSONException("setNested: Unexpected object");
+            logger.debug("setNested: Unexpected object");
         }
     }
 
