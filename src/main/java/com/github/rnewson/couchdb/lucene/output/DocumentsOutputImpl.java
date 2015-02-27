@@ -1,5 +1,6 @@
 package com.github.rnewson.couchdb.lucene.output;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -13,6 +14,9 @@ import java.io.IOException;
  * Transforms the JSON documents in other JSON documents
  */
 public class DocumentsOutputImpl implements Output {
+
+    private static Logger logger =
+            Logger.getLogger(DocumentsOutputImpl.class.getName());
 
     private OutputFormats format;
     private String callback;
@@ -46,6 +50,8 @@ public class DocumentsOutputImpl implements Output {
                 // something went wrong, ignore parser
             }
         }
+
+        logger.debug("Output: " + this.toString());
     }
 
     @Override
@@ -65,5 +71,21 @@ public class DocumentsOutputImpl implements Output {
                     this.format.transformDocs(json, this.keys,
                             this.labels, this.delimiter);
         }
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(" - Callback: ")
+                .append(this.callback)
+                .append(" - Debug: ")
+                .append(this.debug)
+                .append(" - Format: ")
+                .append(this.format)
+                .append(" - Delimiter: ")
+                .append(this.delimiter)
+                .append(" - Parser: ")
+                .append(this.parser.getClass().getSimpleName())
+                .toString();
     }
 }

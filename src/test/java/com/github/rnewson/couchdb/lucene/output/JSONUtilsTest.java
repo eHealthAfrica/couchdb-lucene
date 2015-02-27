@@ -74,23 +74,6 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void testFlatDocumentsException() {
-        JSONArray input = new JSONArray();
-        input.put("a simple string");
-        input.put("other simple string");
-
-        Exception expected = null;
-        try {
-            JSONUtils.flat(input, null);
-        } catch (JSONException e) {
-            expected = e;
-        }
-
-        assertNotNull(expected);
-        assertThat(expected.getMessage(), is("Error flattening JSONArray."));
-    }
-
-    @Test
     public void testMapDocument() throws JSONException {
         String input = "{ \"a\" : { \"b\" : 1, \"g\": 1 }," +
                 " \"c\" : [ 1, 2, 3 ], " +
