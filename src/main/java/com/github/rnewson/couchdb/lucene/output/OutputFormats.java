@@ -65,14 +65,20 @@ public enum OutputFormats {
         switch (this) {
             case CSV:
                 StringBuilder csv = new StringBuilder();
-                String EOL = "\n";
-                String sep = ";";
-                if (delimiter != null && delimiter.equalsIgnoreCase("tab")) {
+                final String EOL = "\n";
+                final String sep;
+                if (delimiter != null
+                        && delimiter.equalsIgnoreCase("tab")) {
+                    // TAB character
                     sep = "\t";
-                } else if (delimiter != null && delimiter.length() == 1) {
+                } else if (delimiter != null
+                        && delimiter.length() == 1
+                        && !delimiter.equals("\"")) {
+                    // delimiter is only one character
+                    // and cannot be double quotes " (escape character)
                     sep = delimiter;
-                }
-                if (sep.equals("\"")) {
+                } else {
+                    // default value
                     sep = ";";
                 }
 
