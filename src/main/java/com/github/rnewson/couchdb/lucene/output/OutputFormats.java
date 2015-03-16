@@ -8,9 +8,9 @@ import org.json.JSONException;
  */
 public enum OutputFormats {
 
-    JSON("json", "application/json"),
-    XML("xml", "application/xml"),
-    CSV("csv", "text/plain");
+    JSON("json", "attachment/json"),
+    XML("xml", "attachment/xml"),
+    CSV("csv", "attachment/csv");
 
     private String formatType;
     private String contentType;
@@ -54,7 +54,7 @@ public enum OutputFormats {
      */
     public String transformDocs(final JSONArray docs,
                                 final String[] keys,
-                                final String labels,
+                                final String[] labels,
                                 final String delimiter)
             throws JSONException {
 
@@ -65,11 +65,15 @@ public enum OutputFormats {
         switch (this) {
             case CSV:
                 StringBuilder csv = new StringBuilder();
-                String join = ",";
-                if (delimiter != null && delimiter.length() == 1) {
-                    join = delimiter;
-                } else if (delimiter != null && delimiter.equals("tab")) {
-                    join = "\t";
+                String EOL = "\n";
+                String sep = ";";
+                if (delimiter != null && delimiter.equalsIgnoreCase("tab")) {
+                    sep = "\t";
+                } else if (delimiter != null && delimiter.length() == 1) {
+                    sep = delimiter;
+                }
+                if (sep.equals("\"")) {
+                    sep = ";";
                 }
 
                 // flatten documents
@@ -85,21 +89,23 @@ public enum OutputFormats {
                 }
 
                 // decide first row
-                if (labels != null && labels.trim().length() > 0) {
+                if (labels != null && labels.length > 0) {
                     // use labels as first row
-                    csv.append(labels);
+                    for (String label : labels) {
+                        csv.append(label).append(sep);
+                    }
                 } else {
                     // use properties names as first row
-                    csv.append(names.join(join));
+                    csv.append(names.join(sep));
                 }
-                csv.append("\n");
+                csv.append(EOL);
 
                 for (int i = 0; i < flattenDocs.length(); i++) {
                     csv.append(flattenDocs
                             .getJSONObject(i)
                             .toJSONArray(names)
-                            .join(join));
-                    csv.append("\n");
+                            .join(sep));
+                    csv.append(EOL);
                 }
 
                 return csv.toString();

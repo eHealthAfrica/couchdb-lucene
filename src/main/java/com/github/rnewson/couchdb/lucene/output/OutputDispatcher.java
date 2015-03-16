@@ -32,10 +32,14 @@ public class OutputDispatcher {
                     if (keysParam != null && keysParam.trim().length() > 0) {
                         keys = keysParam.split(",");
                     }
-                    String labels = req.getParameter(CSV_PARAM);
+                    String labelsParam = req.getParameter(CSV_PARAM);
+                    String[] labels = null;
+                    if (labelsParam != null && labelsParam.trim().length() > 0) {
+                        labels = labelsParam.split(",");
+                    }
                     String delimiter = req.getParameter(DELIMITER_PARAM);
                     if (delimiter == null || delimiter.isEmpty()) {
-                        delimiter = ","; // default value
+                        delimiter = ";"; // default value
                     }
                     String parser = req.getParameter(PARSER_PARAM);
 

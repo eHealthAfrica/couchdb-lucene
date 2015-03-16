@@ -22,7 +22,7 @@ public class DocumentsOutputImpl implements Output {
     private String callback;
     private boolean debug;
     private String[] keys;
-    private String labels;
+    private String[] labels;
     private String delimiter;
     private JSONParser parser;
 
@@ -30,7 +30,7 @@ public class DocumentsOutputImpl implements Output {
                                boolean debug,
                                OutputFormats format,
                                String[] keys,
-                               String labels,
+                               String[] labels,
                                String delimiter,
                                String parserClass) {
         this.callback = callback;
@@ -65,27 +65,36 @@ public class DocumentsOutputImpl implements Output {
         if (this.callback != null) {
             return String.format("%s(%s)", this.callback, json);
         } else {
+            String filename = req.getParameter("filename");
+            if (filename != null && !filename.isEmpty()) {
+                filename = resp.encodeURL(filename);
+                resp.setHeader("Content-Disposition",
+                        "attachment; filename=\"" + filename + "\"");
+            }
             resp.setContentType(this.format.getContentType());
+
             return this.debug ?
                     json.toString(2) :
-                    this.format.transformDocs(json, this.keys,
-                            this.labels, this.delimiter);
+                    this.format.transformDocs(
+                            json,
+                            this.keys,
+                            this.labels,
+                            this.delimiter);
         }
     }
 
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(" - Callback: ")
-                .append(this.callback)
-                .append(" - Debug: ")
-                .append(this.debug)
-                .append(" - Format: ")
-                .append(this.format)
-                .append(" - Delimiter: ")
-                .append(this.delimiter)
-                .append(" - Parser: ")
-                .append(this.parser.getClass().getSimpleName())
-                .toString();
+        return "Output"
+                .concat(" - Callback: ")
+                .concat(this.callback == null ? "none" : this.callback)
+                .concat(" - Debug: ")
+                .concat(Boolean.toString(this.debug))
+                .concat(" - Format: ")
+                .concat(this.format.toString())
+                .concat(" - Delimiter: ")
+                .concat(this.delimiter)
+                .concat(" - Parser: ")
+                .concat(this.parser.getClass().getSimpleName());
     }
 }
