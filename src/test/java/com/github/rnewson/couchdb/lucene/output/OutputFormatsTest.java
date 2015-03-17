@@ -61,10 +61,10 @@ public class OutputFormatsTest {
         JSONArray docs = getFixture();
         OutputFormats format = OutputFormats.CSV;
         String[] keys = {"bar.foo", "baz"};
-        String labels = "\"foo\"\t\"baz\"";
+        String[] labels = {"foo", "baz"};
         String result = format.transformDocs(docs, keys, labels, "tab");
 
-        String output = labels + "\n" +
+        String output = "foo\tbaz\t\n" +
                 "1\t11\n" +
                 "2\t22\n" +
                 "3\t33\n" +
