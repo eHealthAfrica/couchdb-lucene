@@ -12,6 +12,10 @@ import static org.junit.Assert.assertThat;
  */
 public class OutputFormatsTest {
 
+    static {
+        System.setProperty("line.separator", "|");
+    }
+
     @Test
     public void testJSONFormat() throws Exception {
         JSONArray docs = getFixture();
@@ -47,11 +51,11 @@ public class OutputFormatsTest {
         String[] keys = {"bar.foo", "baz"};
         String result = format.transformDocs(docs, keys, null, ";");
 
-        String output = "\"bar.foo\";\"baz\"\n" +
-                "1;11\n" +
-                "2;22\n" +
-                "3;33\n" +
-                "4;44\n";
+        String output = "bar.foo;baz;|" +
+                "1;11;|" +
+                "2;22;|" +
+                "3;33;|" +
+                "4;44;|";
 
         assertThat(result, is(output));
     }
@@ -64,11 +68,11 @@ public class OutputFormatsTest {
         String[] labels = {"foo", "baz"};
         String result = format.transformDocs(docs, keys, labels, "tab");
 
-        String output = "foo\tbaz\t\n" +
-                "1\t11\n" +
-                "2\t22\n" +
-                "3\t33\n" +
-                "4\t44\n";
+        String output = "foo\tbaz\t|" +
+                "1\t11\t|" +
+                "2\t22\t|" +
+                "3\t33\t|" +
+                "4\t44\t|";
 
         assertThat(result, is(output));
     }
