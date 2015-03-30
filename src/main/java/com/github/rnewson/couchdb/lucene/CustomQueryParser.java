@@ -36,7 +36,7 @@ import org.json.JSONObject;
 public final class CustomQueryParser extends QueryParser {
 
     public CustomQueryParser(final Version matchVersion, final String f, final Analyzer a) {
-        super(matchVersion, f, a);
+        super(f, a);
     }
 
     public static Sort toSort(final String sort) throws ParseException {

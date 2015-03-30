@@ -17,7 +17,6 @@
 package com.github.rnewson.couchdb.lucene.util;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import java.io.IOException;
  */
 public final class StatusCodeResponseHandler implements ResponseHandler<Integer> {
 
-    public Integer handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
+    public Integer handleResponse(final HttpResponse response) throws IOException {
         return response.getStatusLine().getStatusCode();
     }
 

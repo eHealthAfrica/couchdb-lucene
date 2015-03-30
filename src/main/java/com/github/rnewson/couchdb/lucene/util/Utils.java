@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+@SuppressWarnings("unused")
 public class Utils {
 
     public static Logger getLogger(final Class<?> clazz, final String suffix) {
@@ -67,8 +68,8 @@ public class Utils {
     /**
      * Split a string on commas but respect commas inside quotes.
      *
-     * @param str
-     * @return
+     * @param str string with commas
+     * @return string array
      */
     public static String[] splitOnCommas(final String str) {
         return str.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");

@@ -23,8 +23,8 @@ import com.github.rnewson.couchdb.lucene.couchdb.ViewSettings;
 import com.github.rnewson.couchdb.lucene.util.Utils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.util.EntityUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.mozilla.javascript.*;
@@ -39,6 +39,7 @@ import java.util.List;
  *
  * @author rnewson
  */
+@SuppressWarnings("unused")
 public final class RhinoDocument extends ScriptableObject {
 
     private static class RhinoAttachment {
@@ -81,7 +82,7 @@ public final class RhinoDocument extends ScriptableObject {
         final String className = args[0].getClass().getName();
 
         if (className.equals("org.mozilla.javascript.NativeDate")) {
-            args[0] = (Date) Context.jsToJava(args[0], Date.class);
+            args[0] = Context.jsToJava(args[0], Date.class);
         }
 
         if (!className.startsWith("java.lang.") &&
@@ -90,7 +91,7 @@ public final class RhinoDocument extends ScriptableObject {
             throw Context.reportRuntimeError(className + " is not supported.");
         }
 
-        if (args.length == 2 && (args[1] == null || args[1] instanceof NativeObject == false)) {
+        if (args.length == 2 && (args[1] == null || !(args[1] instanceof NativeObject))) {
             throw Context.reportRuntimeError("second argument must be an object.");
         }
 
@@ -123,9 +124,9 @@ public final class RhinoDocument extends ScriptableObject {
         return (RhinoDocument) obj;
     }
 
-    private final List<RhinoAttachment> attachments = new ArrayList<RhinoAttachment>();
+    private final List<RhinoAttachment> attachments = new ArrayList<>();
 
-    private final List<RhinoField> fields = new ArrayList<RhinoField>();
+    private final List<RhinoField> fields = new ArrayList<>();
 
     public RhinoDocument() {
     }
@@ -159,12 +160,12 @@ public final class RhinoDocument extends ScriptableObject {
             throws IOException {
         final ResponseHandler<Void> handler = new ResponseHandler<Void>() {
 
-            public Void handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
+            public Void handleResponse(final HttpResponse response) throws IOException {
                 final HttpEntity entity = response.getEntity();
                 try {
                     Tika.INSTANCE.parse(entity.getContent(), entity.getContentType().getValue(), attachment.fieldName, out);
                 } finally {
-                    entity.consumeContent();
+                    EntityUtils.consume(entity);
                 }
                 return null;
             }

@@ -23,7 +23,6 @@ import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
@@ -230,7 +229,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
 
     private final Logger logger;
 
-    private final Map<String, View> paths = new HashMap<String, View>();
+    private final Map<String, View> paths = new HashMap<>();
 
     private HttpUriRequest req;
 
@@ -291,7 +290,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
     }
 
     public Void handleResponse(final HttpResponse response)
-            throws ClientProtocolException, IOException {
+            throws IOException {
         final HttpEntity entity = response.getEntity();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(
                 entity.getContent(), "UTF-8"));
@@ -303,7 +302,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
             // Heartbeat.
             if (line.length() == 0) {
                 logger.trace("heartbeat");
-                continue loop;
+                continue;
             }
 
             try {
@@ -311,12 +310,12 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
 
                 if (json.has("error")) {
                     logger.warn("Indexing stopping due to error: " + json);
-                    break loop;
+                    break;
                 }
 
                 if (json.has("last_seq")) {
                     logger.info("End of changes detected.");
-                    break loop;
+                    break;
                 }
 
                 final UpdateSequence seq = UpdateSequence.parseUpdateSequence(json.getString("seq"));
@@ -343,7 +342,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
                 if (id.startsWith("_design")) {
                     if (seq.isLaterThan(ddoc_seq)) {
                         logger.info("Exiting due to design document change.");
-                        break loop;
+                        break;
                     }
                 }
 
@@ -377,7 +376,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
                 }
             } catch (final JSONException e) {
                 logger.error("JSON exception in changes loop", e);
-                break loop;
+                break;
             }
         }
         req.abort();
@@ -500,7 +499,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
 
                     final JSONObject freqs = new JSONObject();
 
-                    final Set<Term> terms = new HashSet<Term>();
+                    final Set<Term> terms = new HashSet<>();
                     rewritten_q.extractTerms(terms);
                     for (final Object term : terms) {
                         final int freq = searcher.getIndexReader().docFreq((Term) term);
@@ -516,7 +515,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
                             "include_docs");
                     final int highlights = getIntParameter(req, "highlights", 0);
                     final int highlight_length = max(getIntParameter(req, "highlight_length", 18), 18); // min for fast term vector highlighter is 18
-                    final boolean include_termvectors = getBooleanParameter(req, "include_termvectors");
+                    //final boolean include_termvectors = getBooleanParameter(req, "include_termvectors");
                     final int limit = getIntParameter(req, "limit",
                             ini.getInt("lucene.limit", 25));
                     final Sort sort = CustomQueryParser.toSort(req
@@ -530,7 +529,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
                         final String[] fields = Utils.splitOnCommas(
                                 req.getParameter("include_fields"));
                         final List<String> list = Arrays.asList(fields);
-                        fieldsToLoad = new HashSet<String>(list);
+                        fieldsToLoad = new HashSet<>(list);
                     }
 
                     if (sort == null) {
@@ -703,7 +702,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
             final IndexState state = entry.getValue();
 
             if (state.pending_seq.isLaterThan(getUpdateSequence(state.writer))) {
-                final Map<String, String> userData = new HashMap<String, String>();
+                final Map<String, String> userData = new HashMap<>();
                 userData.put("last_seq", state.pending_seq.toString());
                 state.writer.setCommitData(userData);
                 state.writer.commit();
@@ -861,10 +860,9 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         return ddoc + "/" + view;
     }
 
-
-    private final List<String> blacklist() {
+    private List<String> blacklist() {
         Integer size = ini.getList("couchdb.blacklist", new ArrayList<String>()).size();
-        List<String> blacklist = new ArrayList<String>(size);
+        List<String> blacklist = new ArrayList<>(size);
         for (Object o : ini.getList("couchdb.blacklist", new ArrayList<String>())) {
             blacklist.add(String.valueOf(o));
         }

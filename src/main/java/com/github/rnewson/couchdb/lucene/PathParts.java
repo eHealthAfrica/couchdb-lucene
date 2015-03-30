@@ -26,7 +26,7 @@ public class PathParts {
             .compile("^/([^/]+)/([^/]+)/_design/([^/]+)/([^/]+)/?([^/]+)?");
 
     private static final Pattern GLOBAL_REGEX = Pattern
-            .compile("^/([^/]+)/([^/]+)/((([^/]+)))");
+            .compile("^/([^/]+)/([^/]+)/([^/]+)");
 
     private Matcher matcher;
 

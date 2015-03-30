@@ -28,26 +28,26 @@ import java.io.IOException;
 
 public final class HttpUtils {
 
-    public static final int delete(final HttpClient httpClient, final String url) throws IOException {
+    public static int delete(final HttpClient httpClient, final String url) throws IOException {
         return httpClient.execute(new HttpDelete(url), new StatusCodeResponseHandler());
     }
 
-    public static final String execute(final HttpClient httpClient, final HttpUriRequest request) throws IOException {
+    public static String execute(final HttpClient httpClient, final HttpUriRequest request) throws IOException {
         return httpClient.execute(request, new ErrorPreservingResponseHandler());
     }
 
-    public static final String get(final HttpClient httpClient, final String url) throws IOException {
+    public static String get(final HttpClient httpClient, final String url) throws IOException {
         return execute(httpClient, new HttpGet(url));
     }
 
-    public static final String post(final HttpClient httpClient, final String url, final JSONObject body) throws IOException {
+    public static String post(final HttpClient httpClient, final String url, final JSONObject body) throws IOException {
         final HttpPost post = new HttpPost(url);
         post.setHeader("Content-Type", Constants.APPLICATION_JSON);
         post.setEntity(new StringEntity(body.toString(), "UTF-8"));
         return execute(httpClient, post);
     }
 
-    public static final int put(final HttpClient httpClient, final String url, final String body) throws IOException {
+    public static int put(final HttpClient httpClient, final String url, final String body) throws IOException {
         final HttpPut put = new HttpPut(url);
         if (body != null) {
             put.setHeader("Content-Type", Constants.APPLICATION_JSON);

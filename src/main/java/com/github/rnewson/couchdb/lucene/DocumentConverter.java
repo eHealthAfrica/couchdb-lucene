@@ -31,7 +31,6 @@ import org.json.JSONObject;
 import org.mozilla.javascript.*;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,11 +53,7 @@ public final class DocumentConverter {
         // Allow custom document helper class.
         try {
             ScriptableObject.defineClass(scope, RhinoDocument.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
 
@@ -100,7 +95,7 @@ public final class DocumentConverter {
 
         if (result instanceof NativeArray) {
             final NativeArray nativeArray = (NativeArray) result;
-            final Collection<Document> arrayResult = new ArrayList<Document>((int) nativeArray.getLength());
+            final Collection<Document> arrayResult = new ArrayList<>((int) nativeArray.getLength());
             for (int i = 0; i < (int) nativeArray.getLength(); i++) {
                 if (nativeArray.get(i, null) instanceof RhinoDocument) {
                     final RhinoDocument rhinoDocument = (RhinoDocument) nativeArray.get(i, null);

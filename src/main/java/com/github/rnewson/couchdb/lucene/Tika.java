@@ -30,6 +30,7 @@ import java.io.InputStream;
 
 import static com.github.rnewson.couchdb.lucene.util.Utils.text;
 
+@SuppressWarnings("unused")
 public final class Tika {
 
     public static final Tika INSTANCE = new Tika();

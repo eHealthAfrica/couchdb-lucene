@@ -22,9 +22,9 @@ import org.apache.lucene.util.Version;
 
 public final class Constants {
 
-    public static final Version VERSION = Version.LUCENE_4_10_2;
+    public static final Version VERSION = Version.LUCENE_4_10_4;
 
-    public static final Analyzer ANALYZER = new StandardAnalyzer(VERSION);
+    public static final Analyzer ANALYZER = new StandardAnalyzer();
 
     public static final String APPLICATION_JSON = "application/json";
 
