@@ -51,9 +51,10 @@ public final class Database {
         this.dbName = dbName;
         try {
             Config config = new Config();
-            this.size = config.getConfiguration().getInt("lucene.size", 1000);
+            this.size = config.getConfiguration()
+                    .getInt("lucene.couchdDocumentSize", 500);
         } catch (ConfigurationException ignore) {
-            this.size = 1000;
+            this.size = 500;
         }
     }
 
