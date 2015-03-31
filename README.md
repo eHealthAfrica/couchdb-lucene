@@ -439,8 +439,10 @@ The following parameters can be passed for more sophisticated searches;
 <dt>skip</dt><dd>the number of results to skip</dd>
 <dt>sort</dt><dd>the comma-separated fields to sort on. Prefix with / for ascending order and \ for descending order (ascending is the default if not specified). Type-specific sorting is also available by appending the type between angle brackets (e.g, sort=amount&lt;float&gt;). Supported types are 'float', 'double', 'int', 'long' and 'date'.</dd>
 <dt>stale=ok</dt><dd>If you set the <i>stale</i> option to <i>ok</i>, couchdb-lucene will not block if the index is not up to date and it will immediately return results. Therefore searches may be faster as Lucene caches important data (especially for sorting). A query without stale=ok will block and use the latest data committed to the index. Unlike CouchDBs stale=ok option for views, couchdb-lucene will trigger an index update unless one is already running.</dd>
-<dt>view</dt><dd>the view used to fetch the documents if include_docs=true.
-The use of views allows postprocessing the given results. The view values MUST contain the document '_id' property.
+<dt>view</dt><dd>the view id '_design/<design_name>/_view/<view_name>' used
+to fetch the documents if include_docs=true.
+The use of views allows postprocessing the given results.
+The view values MUST contain the document '_id' property.
 If omitted '_all_docs' will be used.
 <dt>output_format</dt><dd>the expected output format for the documents export.
 Allowed values: <i>json</i>, <i>xml</i>, <i>csv</i>.
@@ -496,6 +498,7 @@ All Dublin Core attributes are indexed and stored if detected in the attachment.
 http://localhost:5984/dbname/_fti/_design/foo/view_name?q=field_name:value
 http://localhost:5984/dbname/_fti/_design/foo/view_name?q=field_name:value&sort=other_field
 http://localhost:5984/dbname/_fti/_design/foo/view_name?debug=true&sort=billing_size&lt;long&gt;&q=body:document AND customer:[A TO C]
+http://localhost:5984/dbname/_fti/_design/foo/view_name?debug=true&sort=billing_size&lt;long&gt;&q=body:document AND customer:[A TO C]&include_docs=true&view=_design/design_doc_name/_view/my_view
 </pre>
 
 <h2>Using the proxy handler</h2>
@@ -503,6 +506,7 @@ http://localhost:5984/dbname/_fti/_design/foo/view_name?debug=true&sort=billing_
 http://localhost:5984/_fti/local/dbname/_design/foo/view_name?q=field_name:value
 http://localhost:5984/_fti/local/dbname/_design/foo/view_name?q=field_name:value&sort=other_field
 http://localhost:5984/_fti/local/dbname/_design/foo/view_name?debug=true&sort=billing_size&lt;long&gt;&q=body:document AND customer:[A TO C]
+http://localhost:5984/_fti/local/dbname/_design/foo/view_name?debug=true&sort=billing_size&lt;long&gt;&q=body:document AND customer:[A TO C]&include_docs=true&view=_design/design_doc_name/_view/my_view
 </pre>
 
 <h2>Search Results Format</h2>
