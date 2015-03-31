@@ -16,7 +16,9 @@
 
 package com.github.rnewson.couchdb.lucene.couchdb;
 
+import com.github.rnewson.couchdb.lucene.Config;
 import com.github.rnewson.couchdb.lucene.util.Utils;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
@@ -33,18 +35,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public final class Database {
 
     private final HttpClient httpClient;
 
     private final String url;
     private final String dbName;
+    private int size;
 
     public Database(final HttpClient httpClient, final String aUrl, final String dbName) {
         final String url = aUrl + dbName;
         this.httpClient = httpClient;
         this.url = url.endsWith("/") ? url : url + "/";
         this.dbName = dbName;
+        try {
+            Config config = new Config();
+            this.size = config.getConfiguration().getInt("lucene.size", 1000);
+        } catch (ConfigurationException ignore) {
+            this.size = 1000;
+        }
     }
 
     public boolean create() throws IOException {
@@ -59,18 +69,18 @@ public final class Database {
         final String body = HttpUtils.get(httpClient, String
                 .format("%s_all_docs?startkey=%s&endkey=%s&include_docs=true",
                         url, Utils.urlEncode("\"_design\""), Utils
-                        .urlEncode("\"_design0\"")));
+                                .urlEncode("\"_design0\"")));
         final JSONObject json = new JSONObject(body);
         return toDesignDocuments(json);
     }
 
     public List<DesignDocument> getIndexableDesignDocuments(List blacklist) throws IOException, JSONException {
-        final List<DesignDocument> result = new ArrayList<DesignDocument>();
-        for (final DesignDocument ddoc: getAllDesignDocuments()) {
+        final List<DesignDocument> result = new ArrayList<>();
+        for (final DesignDocument ddoc : getAllDesignDocuments()) {
             if (!blacklist.contains(dbName + "/" + ddoc.getId())) {
                 result.add(ddoc);
             }
-        };
+        }
         return result;
     }
 
@@ -88,21 +98,38 @@ public final class Database {
 
     public List<CouchDocument> getDocuments(final String... ids)
             throws IOException, JSONException {
-        if (ids.length == 0) {
+        return getDocuments(null, ids);
+    }
+
+    public List<CouchDocument> getDocuments(String view,
+                                            final String... ids)
+            throws IOException, JSONException {
+        if (ids == null || ids.length == 0) {
             return Collections.emptyList();
         }
-
-        final JSONArray keys = new JSONArray();
-        for (final String id : ids) {
-            assert id != null;
-            keys.put(id);
+        if (view == null || view.isEmpty()) {
+            view = "_all_docs?include_docs=true";
         }
-        final JSONObject req = new JSONObject();
-        req.put("keys", keys);
 
-        final String body = HttpUtils.post(httpClient, url
-                + "_all_docs?include_docs=true", req);
-        return toDocuments(new JSONObject(body));
+        final List<CouchDocument> docs = new ArrayList<>();
+
+        // send packages of n ids
+        for (int i = 0; i < ids.length; ) {
+            final JSONObject req = new JSONObject();
+            final JSONArray keys = new JSONArray();
+
+            for (int j = i; j < ids.length && i < size; j++, i++) {
+                String id = ids[j];
+                keys.put(id);
+            }
+            req.put("keys", keys);
+
+            final String body = HttpUtils.post(httpClient,
+                    url + view, req);
+            docs.addAll(toDocuments(new JSONObject(body)));
+        }
+
+        return docs;
     }
 
     public DatabaseInfo getInfo() throws IOException, JSONException {
@@ -127,7 +154,7 @@ public final class Database {
             throws IOException {
         final String uri;
         if (timeout > -1) {
-            uri = url + "_changes?feed=continuous&timeout="+timeout+"&include_docs=true";
+            uri = url + "_changes?feed=continuous&timeout=" + timeout + "&include_docs=true";
         } else {
             uri = url + "_changes?feed=continuous&heartbeat=15000&include_docs=true";
         }
@@ -168,7 +195,7 @@ public final class Database {
     }
 
     private List<DesignDocument> toDesignDocuments(final JSONObject json) throws JSONException {
-        final List<DesignDocument> result = new ArrayList<DesignDocument>();
+        final List<DesignDocument> result = new ArrayList<>();
         for (final JSONObject doc : rows(json)) {
             result.add(new DesignDocument(doc));
         }
@@ -176,7 +203,7 @@ public final class Database {
     }
 
     private List<CouchDocument> toDocuments(final JSONObject json) throws JSONException {
-        final List<CouchDocument> result = new ArrayList<CouchDocument>();
+        final List<CouchDocument> result = new ArrayList<>();
         for (final JSONObject doc : rows(json)) {
             result.add(doc == null ? null : new CouchDocument(doc));
         }
@@ -184,10 +211,17 @@ public final class Database {
     }
 
     private List<JSONObject> rows(final JSONObject json) throws JSONException {
-        final List<JSONObject> result = new ArrayList<JSONObject>();
+        final List<JSONObject> result = new ArrayList<>();
         final JSONArray rows = json.getJSONArray("rows");
         for (int i = 0; i < rows.length(); i++) {
-            result.add(rows.getJSONObject(i).optJSONObject("doc"));
+            JSONObject row = rows.optJSONObject(i);
+            if (row == null) continue;
+
+            if (row.optJSONObject("doc") != null) {
+                result.add(row.optJSONObject("doc"));
+            } else if (row.optJSONObject("value") != null) {
+                result.add(row.optJSONObject("value"));
+            }
         }
         return result;
     }

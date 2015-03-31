@@ -439,6 +439,9 @@ The following parameters can be passed for more sophisticated searches;
 <dt>skip</dt><dd>the number of results to skip</dd>
 <dt>sort</dt><dd>the comma-separated fields to sort on. Prefix with / for ascending order and \ for descending order (ascending is the default if not specified). Type-specific sorting is also available by appending the type between angle brackets (e.g, sort=amount&lt;float&gt;). Supported types are 'float', 'double', 'int', 'long' and 'date'.</dd>
 <dt>stale=ok</dt><dd>If you set the <i>stale</i> option to <i>ok</i>, couchdb-lucene will not block if the index is not up to date and it will immediately return results. Therefore searches may be faster as Lucene caches important data (especially for sorting). A query without stale=ok will block and use the latest data committed to the index. Unlike CouchDBs stale=ok option for views, couchdb-lucene will trigger an index update unless one is already running.</dd>
+<dt>view</dt><dd>the view used to fetch the documents if include_docs=true.
+The use of views allows postprocessing the given results. The view values MUST contain the document '_id' property.
+If omitted '_all_docs' will be used.
 <dt>output_format</dt><dd>the expected output format for the documents export.
 Allowed values: <i>json</i>, <i>xml</i>, <i>csv</i>.
 It's used to export only the documents; 'include_docs' is needed; if it's false
