@@ -24,7 +24,7 @@
     <name>CouchDB Lucene</name>
     <description>Full-text indexing for CouchDB</description>
     <url>http://github.com/eHealthAfrica/couchdb-lucene/</url>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
 
     <dependencies>
         <dependency>
