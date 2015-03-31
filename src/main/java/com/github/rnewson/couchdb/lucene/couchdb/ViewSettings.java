@@ -23,6 +23,7 @@ import org.apache.lucene.document.Field.TermVector;
 import org.json.JSONObject;
 import org.mozilla.javascript.NativeObject;
 
+@SuppressWarnings("unused")
 public final class ViewSettings {
 
     public static ViewSettings getDefaultSettings() {

@@ -23,7 +23,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.util.Version;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,8 +34,8 @@ import org.json.JSONObject;
  */
 public final class CustomQueryParser extends QueryParser {
 
-    public CustomQueryParser(final Version matchVersion, final String f, final Analyzer a) {
-        super(matchVersion, f, a);
+    public CustomQueryParser(final String f, final Analyzer a) {
+        super(f, a);
     }
 
     public static Sort toSort(final String sort) throws ParseException {

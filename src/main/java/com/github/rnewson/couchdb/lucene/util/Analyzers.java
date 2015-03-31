@@ -21,7 +21,6 @@ import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.br.BrazilianAnalyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
-import org.apache.lucene.analysis.cn.ChineseAnalyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.core.LowerCaseTokenizer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
@@ -31,13 +30,12 @@ import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.fr.FrenchAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 import org.apache.lucene.analysis.nl.DutchAnalyzer;
 import org.apache.lucene.analysis.ru.RussianAnalyzer;
-import org.apache.lucene.analysis.snowball.SnowballAnalyzer;
 import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.th.ThaiAnalyzer;
-import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,55 +49,55 @@ public enum Analyzers {
     BRAZILIAN {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new BrazilianAnalyzer(Constants.VERSION);
+            return new BrazilianAnalyzer();
         }
     },
     CHINESE {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new ChineseAnalyzer();
+            return new StandardAnalyzer();
         }
     },
     CJK {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new CJKAnalyzer(Constants.VERSION);
+            return new CJKAnalyzer();
         }
     },
     CLASSIC {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new ClassicAnalyzer(Constants.VERSION);
+            return new ClassicAnalyzer();
         }
     },
     CZECH {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new CzechAnalyzer(Constants.VERSION);
+            return new CzechAnalyzer();
         }
     },
     DUTCH {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new DutchAnalyzer(Constants.VERSION);
+            return new DutchAnalyzer();
         }
     },
     ENGLISH {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new StandardAnalyzer(Constants.VERSION);
+            return new StandardAnalyzer();
         }
     },
     FRENCH {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new FrenchAnalyzer(Constants.VERSION);
+            return new FrenchAnalyzer();
         }
     },
     GERMAN {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new GermanAnalyzer(Constants.VERSION);
+            return new GermanAnalyzer();
         }
     },
     KEYWORD {
@@ -113,7 +111,7 @@ public enum Analyzers {
         public Analyzer newAnalyzer(final String args) throws JSONException {
             final JSONObject json = new JSONObject(args == null ? "{}" : args);
             final Analyzer defaultAnalyzer = Analyzers.getAnalyzer(json.optString(Constants.DEFAULT_FIELD, "standard"));
-            final Map<String, Analyzer> analyzers = new HashMap<String, Analyzer>();
+            final Map<String, Analyzer> analyzers = new HashMap<>();
             final Iterator<?> it = json.keys();
             while (it.hasNext()) {
                 final String key = it.next().toString();
@@ -133,36 +131,36 @@ public enum Analyzers {
     RUSSIAN {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new RussianAnalyzer(Constants.VERSION);
+            return new RussianAnalyzer();
         }
     },
     SIMPLE {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new SimpleAnalyzer(Constants.VERSION);
+            return new SimpleAnalyzer();
         }
     },
     SNOWBALL {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new SnowballAnalyzer(Constants.VERSION, args);
+            return new StandardAnalyzer();
         }
     },
     STANDARD {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new StandardAnalyzer(Constants.VERSION);
+            return new StandardAnalyzer();
         }
     },
     THAI {
         @Override
         public Analyzer newAnalyzer(final String args) {
-            return new ThaiAnalyzer(Constants.VERSION);
+            return new ThaiAnalyzer();
         }
     },
     WHITESPACE {
         public Analyzer newAnalyzer(final String args) {
-            return new WhitespaceAnalyzer(Constants.VERSION);
+            return new WhitespaceAnalyzer();
         }
     },
     NGRAM {
@@ -178,7 +176,7 @@ public enum Analyzers {
     private static final class PorterStemAnalyzer extends Analyzer {
         @Override
         protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-            Tokenizer source = new LowerCaseTokenizer(Constants.VERSION, reader);
+            Tokenizer source = new LowerCaseTokenizer(reader);
             return new TokenStreamComponents(source, new PorterStemFilter(source));
         }
     }
@@ -189,6 +187,7 @@ public enum Analyzers {
         private final int max;
 
         public NGramAnalyzer(final Analyzer analyzer, final int min, final int max) {
+            super(PER_FIELD_REUSE_STRATEGY);
             this.analyzer = analyzer;
             this.min = min;
             this.max = max;
@@ -202,7 +201,7 @@ public enum Analyzers {
         @Override
         protected TokenStreamComponents wrapComponents(String fieldName, TokenStreamComponents components) {
             return new TokenStreamComponents(components.getTokenizer(),
-                new NGramTokenFilter(Constants.VERSION, components.getTokenStream(),
+                    new NGramTokenFilter(components.getTokenStream(),
                     this.min, this.max));
         }
     }

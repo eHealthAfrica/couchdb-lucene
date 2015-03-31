@@ -17,8 +17,8 @@
 package com.github.rnewson.couchdb.lucene;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.server.NetworkTrafficServerConnector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -41,7 +41,7 @@ public class Main {
         final File dir = config.getDir();
 
         final Server server = new Server();
-        final SelectChannelConnector connector = new SelectChannelConnector();
+        final NetworkTrafficServerConnector connector = new NetworkTrafficServerConnector(server);
         connector.setHost(config.getConfiguration().getString("lucene.host", "localhost"));
         connector.setPort(config.getConfiguration().getInt("lucene.port", 5985));
 
@@ -50,8 +50,8 @@ public class Main {
         final int blacklistSize = config.getConfiguration().getList(
                 "couchdb.blacklist", new ArrayList<String>()).size();
         if (blacklistSize > 0) {
-            LOG.info("Blacklisted index documents are "  +
-            config.getConfiguration().getList("couchdb.blacklist", new ArrayList<String>())
+            LOG.info("Blacklisted index documents are " +
+                            config.getConfiguration().getList("couchdb.blacklist", new ArrayList<String>())
             );
         }
 

@@ -27,7 +27,7 @@ import java.io.IOException;
 
 public final class ErrorPreservingResponseHandler implements ResponseHandler<String> {
 
-    public String handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
+    public String handleResponse(final HttpResponse response) throws IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
         final String str = entity == null ? null : EntityUtils.toString(entity);

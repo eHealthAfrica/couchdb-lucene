@@ -32,9 +32,6 @@ public final class QueryPlan {
 
     /**
      * Produces a string representation of the query classes used for a query.
-     *
-     * @param query
-     * @return
      */
     public static String toPlan(final Query query) {
         final StringBuilder builder = new StringBuilder(300);

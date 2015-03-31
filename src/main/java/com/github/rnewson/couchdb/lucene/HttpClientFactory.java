@@ -24,7 +24,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ClientConnectionRequest;
 import org.apache.http.conn.ManagedClientConnection;
@@ -43,8 +43,8 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -66,11 +66,11 @@ public final class HttpClientFactory {
                 throws HttpException, IOException {
 
             final AuthState authState = (AuthState) context
-                    .getAttribute(ClientContext.TARGET_AUTH_STATE);
+                    .getAttribute(HttpClientContext.TARGET_AUTH_STATE);
             final CredentialsProvider credsProvider = (CredentialsProvider) context
-                    .getAttribute(ClientContext.CREDS_PROVIDER);
+                    .getAttribute(HttpClientContext.CREDS_PROVIDER);
             final HttpHost targetHost = (HttpHost) context
-                    .getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+                    .getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
 
             // If not auth scheme has been initialized yet
             if (authState.getAuthScheme() == null) {
@@ -79,8 +79,7 @@ public final class HttpClientFactory {
                 Credentials creds = credsProvider.getCredentials(authScope);
                 // If found, generate BasicScheme preemptively
                 if (creds != null) {
-                    authState.setAuthScheme(new BasicScheme());
-                    authState.setCredentials(creds);
+                    authState.update(new BasicScheme(), creds);
                 }
             }
         }

@@ -69,10 +69,18 @@ public class PathParts {
 
     @Override
     public String toString() {
-        return "PathParts [getCommand()=" + getCommand()
-                + ", getDatabaseName()=" + getDatabaseName()
-                + ", getDesignDocumentName()=" + getDesignDocumentName()
-                + ", getKey()=" + getKey() + ", getViewName()=" + getViewName()
+        String command = getCommand() == null ? "" : getCommand();
+        String dbName = getDatabaseName() == null ? "" : getDatabaseName();
+        String designName =
+                getDesignDocumentName() == null ? "" : getDesignDocumentName();
+        String key = getKey() == null ? "" : getKey();
+        String viewName = getViewName() == null ? "" : getViewName();
+
+        return "PathParts [getCommand()=" + command
+                + ", getDatabaseName()=" + dbName
+                + ", getDesignDocumentName()=" + designName
+                + ", getKey()=" + key
+                + ", getViewName()=" + viewName
                 + "]";
     }
 
