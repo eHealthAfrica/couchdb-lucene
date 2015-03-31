@@ -618,9 +618,10 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
                     }
                     // Fetch documents (if requested).
                     if (include_docs && fetch_ids.length > 0) {
+                        String view = req.getParameter("view");
                         final List<CouchDocument> fetched_docs = database
-                                .getDocuments(fetch_ids);
-                        for (int j = 0; j < max; j++) {
+                                .getDocuments(view, fetch_ids);
+                        for (int j = 0; j < fetched_docs.size(); j++) {
                             final CouchDocument doc = fetched_docs.get(j);
                             final JSONObject row = doc == null ?
                                     new JSONObject("{\"error\":\"not_found\"}") :
