@@ -116,7 +116,7 @@ public final class DatabaseIndexer implements Runnable, ResponseHandler<Void> {
         }
 
         public Query parse(final String query, final Operator operator, final Analyzer analyzer) throws ParseException, JSONException {
-            final QueryParser parser = new CustomQueryParser(Constants.VERSION,
+            final QueryParser parser = new CustomQueryParser(
                     Constants.DEFAULT_FIELD, analyzer);
             parser.setDefaultOperator(operator);
             parser.setAllowLeadingWildcard(ini.getBoolean("lucene.allowLeadingWildcard", false));

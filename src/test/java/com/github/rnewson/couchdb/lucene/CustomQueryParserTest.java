@@ -17,7 +17,6 @@
 package com.github.rnewson.couchdb.lucene;
 
 import com.github.rnewson.couchdb.lucene.couchdb.FieldType;
-import com.github.rnewson.couchdb.lucene.util.Constants;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.NumericRangeQuery;
@@ -35,7 +34,7 @@ public class CustomQueryParserTest {
 
     @Before
     public void setup() {
-        parser = new CustomQueryParser(Constants.VERSION, "default", new StandardAnalyzer());
+        parser = new CustomQueryParser("default", new StandardAnalyzer());
     }
 
     @Test
