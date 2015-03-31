@@ -52,7 +52,7 @@ public final class Database {
         try {
             Config config = new Config();
             this.size = config.getConfiguration()
-                    .getInt("lucene.couchdDocumentSize", 500);
+                    .getInt("lucene.couchdbDocumentSize", 500);
         } catch (ConfigurationException ignore) {
             this.size = 500;
         }
