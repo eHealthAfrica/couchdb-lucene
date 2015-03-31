@@ -118,8 +118,8 @@ public final class Database {
             final JSONObject req = new JSONObject();
             final JSONArray keys = new JSONArray();
 
-            for (int j = i; j < ids.length && i < size; j++, i++) {
-                String id = ids[j];
+            for (int p = 0; i < ids.length && p < size; i++, p++) {
+                String id = ids[i];
                 keys.put(id);
             }
             req.put("keys", keys);
