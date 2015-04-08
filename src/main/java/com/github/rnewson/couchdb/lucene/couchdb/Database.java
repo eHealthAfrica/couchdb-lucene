@@ -97,36 +97,37 @@ public final class Database {
         return new DesignDocument(new JSONObject(response));
     }
 
-    public List<CouchDocument> getDocuments(final String... ids)
+    public List<CouchDocument> getDocuments(final String view,
+                                            final String[] ids)
             throws IOException, JSONException {
-        return getDocuments(null, ids);
-    }
 
-    public List<CouchDocument> getDocuments(String view,
-                                            final String... ids)
-            throws IOException, JSONException {
         if (ids == null || ids.length == 0) {
             return Collections.emptyList();
         }
+
+        final String viewName;
         if (view == null || view.isEmpty()) {
-            view = "_all_docs?include_docs=true";
+            viewName = "_all_docs?include_docs=true";
+        } else {
+            viewName = view;
         }
 
         final List<CouchDocument> docs = new ArrayList<>();
 
-        // send packages of n ids
-        for (int i = 0; i < ids.length; ) {
+        // send packages of size n
+        int limit = ids.length;
+        for (int i = 0; i < limit; ) {
             final JSONObject req = new JSONObject();
             final JSONArray keys = new JSONArray();
 
-            for (int p = 0; i < ids.length && p < size; i++, p++) {
+            for (int p = 0; i < limit && p < size; i++, p++) {
                 String id = ids[i];
                 keys.put(id);
             }
             req.put("keys", keys);
 
             final String body = HttpUtils.post(httpClient,
-                    url + view, req);
+                    url + viewName, req);
             docs.addAll(toDocuments(new JSONObject(body)));
         }
 
@@ -134,24 +135,28 @@ public final class Database {
     }
 
     public DatabaseInfo getInfo() throws IOException, JSONException {
-        return new DatabaseInfo(new JSONObject(HttpUtils.get(httpClient,
-                url)));
+        return new DatabaseInfo(
+                new JSONObject(HttpUtils.get(httpClient, url)));
     }
 
-    public UpdateSequence getLastSequence() throws IOException, JSONException {
+    public UpdateSequence getLastSequence()
+            throws IOException, JSONException {
         final JSONObject result = new JSONObject(HttpUtils.get(httpClient, url
                 + "_changes?limit=0&descending=true"));
         return UpdateSequence.parseUpdateSequence(result.getString("last_seq"));
     }
 
-    public <T> T handleAttachment(final String doc, final String att,
-                                  final ResponseHandler<T> handler) throws IOException {
+    public <T> T handleAttachment(final String doc,
+                                  final String att,
+                                  final ResponseHandler<T> handler)
+            throws IOException {
         final HttpGet get = new HttpGet(url + "/" + Utils.urlEncode(doc) + "/"
                 + Utils.urlEncode(att));
         return httpClient.execute(get, handler);
     }
 
-    public HttpUriRequest getChangesRequest(final UpdateSequence since, final long timeout)
+    public HttpUriRequest getChangesRequest(final UpdateSequence since,
+                                            final long timeout)
             throws IOException {
         final String uri;
         if (timeout > -1) {
@@ -213,15 +218,17 @@ public final class Database {
 
     private List<JSONObject> rows(final JSONObject json) throws JSONException {
         final List<JSONObject> result = new ArrayList<>();
-        final JSONArray rows = json.getJSONArray("rows");
-        for (int i = 0; i < rows.length(); i++) {
-            JSONObject row = rows.optJSONObject(i);
-            if (row == null) continue;
+        final JSONArray rows = json.optJSONArray("rows");
+        if (rows != null) {
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject row = rows.optJSONObject(i);
+                if (row == null) continue;
 
-            if (row.optJSONObject("doc") != null) {
-                result.add(row.optJSONObject("doc"));
-            } else if (row.optJSONObject("value") != null) {
-                result.add(row.optJSONObject("value"));
+                if (row.optJSONObject("doc") != null) {
+                    result.add(row.optJSONObject("doc"));
+                } else if (row.optJSONObject("value") != null) {
+                    result.add(row.optJSONObject("value"));
+                }
             }
         }
         return result;
@@ -229,27 +236,15 @@ public final class Database {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((url == null) ? 0 : url.hashCode());
-        return result;
+        return 31 + url.hashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Database other = (Database) obj;
-        if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+    public boolean equals(Object that) {
+        return (that != null)
+                && ((this == that)
+                || ((that instanceof Database)
+                && url.equals(((Database) that).url)));
     }
 
     @Override
